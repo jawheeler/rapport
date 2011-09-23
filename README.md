@@ -11,32 +11,36 @@ Rapport allows you to create tabular reports with a DSL, which can be outputted 
     require 'rubygems'
     require 'rapport'
 
-    class Foo
+    class OrderReport
       include Rapport::Report
     
       def columns
         [
-          ['Name', :name],
-          ['Rank', :rank],
-          ['Serial Number', :ssn]
+          ['Order ID', :order_id],
+          ['Type', :class],
+          ['ID', :id],
+          ['Price', :price]
         ]
       end
     
       def cell_calculators
         {
-          :name => {
-            :through => :user
-            :map_to => lambda {|model| model.first_name + model.last_name }
+          :order_id => {
+            :through => :order
+            :map_to => :id
           },
-          :rank => {
-            :army => :abbreviated_rank
+          :price => {
+            :additional_charge => :amount
           }
         }
       end
     
       def each_raw_row
-        Soldier.all(:include => :user).each do |soldier|
-          yield soldier, soldier.type.to_s
+        LineItem.scope(:created_at > 1.day.ago).each do |line_item|
+          yield line_item
+        end
+        AdditionalCharge.scope(:created_at > 1.day.ago).each do |additional_charge|
+          yield additional_charge, :additional_charge
         end
       end
     end
