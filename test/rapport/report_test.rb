@@ -14,7 +14,7 @@ class ReportTest < Test::Unit::TestCase
   
     should "return a row for each raw row" do
       raw_rows = []
-      @report.each_raw_row {|row| raw_rows << row}
+      @report.each_model {|row| raw_rows << row}
       assert_equal raw_rows.length, @execute_result.length
     end
   
@@ -23,37 +23,27 @@ class ReportTest < Test::Unit::TestCase
     end
   end
   
-  context ".column_names" do
+  context ".column_headers" do
     execute do
-      @report.column_names
+      @report.column_headers
     end
   
-    should "return column names only" do
-      @execute_result.each do |column_name|
-        assert_match /Column Header/, column_name
+    should "return column headers only" do
+      @execute_result.each do |column_header|
+        assert_match /Column/, column_header
       end
     end
   end
   
-  context ".column_keys" do
+  context ".column_symbols" do
     execute do
-      @report.column_keys
+      @report.column_symbols
     end
   
-    should "return calculators only" do
-      @execute_result.each do |column_name|
-        assert_match /calc/, column_name.to_s
+    should "return symbols only" do
+      @execute_result.each do |column_symbol|
+        assert_match /calc/, column_symbol.to_s
       end
-    end
-  end
-  
-  context ".cell_calculators" do
-    execute do
-      @report.cell_calculators
-    end
-  
-    should "return a hash" do
-      assert_equal Hash, @execute_result.class
     end
   end
   
@@ -76,7 +66,7 @@ class ReportTest < Test::Unit::TestCase
     end
   
     execute do
-      @report.bypass.calculators[:key] = @cell_calculator
+      @report.bypass._calculators[:key] = @cell_calculator
       @report.bypass.cell_calculator_for(:key, :row_type)
     end
   
@@ -225,7 +215,7 @@ class ReportTest < Test::Unit::TestCase
     end
        
     execute do
-      @proc = @report.bypass.safe_proc(@orig_proc)
+      @proc = Rapport.safe_proc(@orig_proc)
       @proc.call(@model)
     end
   
@@ -249,8 +239,6 @@ class ReportTest < Test::Unit::TestCase
         end          
       end
     end
-  
-  
   
     context "happy model" do
       setup do

@@ -44,38 +44,66 @@ class Test::Unit::TestCase
   end
 end
 
-class TestReport
-  include Rapport::Report
+module Rapport
+  class TestReport
+    include Rapport::Report
   
-  def each_raw_row
-    (0..2).each do |r|
-      yield [(0..3).map { |c| "t0 #{c}#{r}" }, :type0]
+    def initialize(options = {})
+      self.options = options
     end
-    raise options[:exception] if options[:exception]
-    (0..2).each do |r|
-      yield [(0..3).map { |c| "t1 #{c}#{r}" }, :type1]
+  
+    def each_model
+      (0..2).each do |r|
+        yield [(0..3).map { |c| "t0 #{c}#{r}" }, :type0]
+      end
+      raise options[:exception] if options[:exception]
+      (0..2).each do |r|
+        yield [(0..3).map { |c| "t1 #{c}#{r}" }, :type1]
+      end
     end
+
+    column "Column 0", :calc0
+
+    column "Column 1", :calc1, :type0 => lambda { |m| 'T0' + m[1] },
+                               :type1 => lambda { |m| 'T1' + m[1] },
+                               :format => :happy
+                            
+    column "Column 2", :calc2, :map_to => lambda { |m| 'D' + m[2] },
+                               :format  => lambda { |value| "Formatted" + value }
+  
+    column "Column 3", :calc3, :map_to => lambda { |m| row_data[:calc2] + m[3] },
+                               :format_special => lambda { |value| "Formatted Special" + value }
+
   end
 
-  def columns
-    (0..4).map { |c| ["Column Header #{c}", :"calc#{c}"] }
-  end
-
-  def cell_calculators
-    super.merge!(
-        :calc1 => {
-            :type0 => lambda { |m| 'T0' + m[1] },
-            :type1 => lambda { |m| 'T1' + m[1] }
-        },
-        :calc2 => {
-            :map_to => lambda { |m| 'D' + m[2] },
-            :format  => lambda { |value| "Formatted" + value }
-        },
-        :calc3 => {
-            :map_to        => lambda { |m| row_data[:calc2] + m[3] },
-            :format_special => lambda { |value| "Formatted Special" + value }
-        }
-    )
+  class ReportGeneratorTest
+    include Rapport::ReportGenerator
+    
+    attr_reader :log
+    
+    def initialize
+      @log = ''
+    end
+    
+    def logger
+      Logger.new(StringIO.new(@log))
+    end
+  
+    generate_with do
+      output = "START\n"
+      each_row do |row|
+        output << (0...row.length).to_a.zip(row).join("-")
+        output << "\n"
+      end
+      output << "END\n"
+      output
+    end
+  
+    cell_format(:happy) {|value| "Happy#{value}"}
+      
+    cell_format(Time) {|value| value.strftime("%H:%m")}
   end
 end
+
+
 

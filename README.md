@@ -5,49 +5,44 @@ Rapport allows you to create tabular reports with a DSL, which can be outputted 
 ## Quick-Start
 
 ### Creating a Report
-
-  To give a class reporting functionality, implement *columns*, *each_raw_row*, and optionally *cell_calculators*:
   
     require 'rubygems'
     require 'rapport'
 
     class OrderReport
       include Rapport::Report
+
+      # All equivalent:
+      # column 'Product ID', :map_to => lambda {|model| !model.nil? and model.respond_to?(:product_id) ? model.product_id : nil }
+      # column 'Product ID', :map_to => :product_id
+      # column 'Product ID', :product_id
+      column 'Product ID'         # by default converts 'Product ID' to :product_id
+      
+      # special calculation depending on type of model
+      column 'Price',         :additional_charge => :amount,
+                              :line_item => :price,  # not required; defaults to :price
+                              :special_line_item => lambda {|line_item| line_item.price - line_item.tax },
+                              # Display price (in cents) as dollars
+                              :format => :cents 
+      
+      # Navigate an object heirarchy using :through
+      column 'Order ID',      :through -> :order, :map_to => :id                    
+      column 'Customer Name', :through => [:order, :customer], :map_to => lambda {|customer| "#{customer.first_name} #{customer.last_name}" }
     
-      def columns
-        [
-          ['Order ID', :order_id],
-          ['Type', :class],
-          ['ID', :id],
-          ['Price', :price]
-        ]
-      end
-    
-      def cell_calculators
-        {
-          :order_id => {
-            :through => :order
-            :map_to => :id
-          },
-          :price => {
-            :additional_charge => :amount
-          }
-        }
-      end
-    
-      def each_raw_row
-        LineItem.scope(:created_at > 1.day.ago).each do |line_item|
-          yield line_item
+      def each_model
+        AdditionalCharge.in_order_report.each do |additional_charge|
+          yield additional_charge
         end
-        AdditionalCharge.scope(:created_at > 1.day.ago).each do |additional_charge|
-          yield additional_charge, :additional_charge
+           
+        LineItem.in_order_report.each do |line_item|
+          if line_item.special?
+            yield line_item, :special_line_item  # uses special price calculation above 
+          else
+            yield line_item  # equivalent to yield line_item, :line_item
+          end
         end
       end
     end
-  
-  
-
-
 
 ## Copyright
 

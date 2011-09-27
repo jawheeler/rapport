@@ -5,21 +5,31 @@ module Rapport
     
     def self.from(report)
       options = report.options
-      Rapport.const_get("ReportGenerator#{Rapport.format_camel_case(options[:format].to_s)}").new(report)
+      Rapport.const_get("ReportGenerator#{Rapport.format_camel_case(options[:format].to_s)}").from(report)
     end   
     
     def self.included(base)
       base.extend(ClassMethods)
-      def base.all_cell_formats
-        @all_cell_formats ||= {}
-      end
+      base.instance_variable_set(:@cell_formatter, CellFormatter.new)
+      def base.inherited(subclass)
+        super(subclass)
+        subclass.instance_variable_set(:@cell_formatter, base.instance_variable_get(:@cell_formatter).dup)
+      end      
     end
     
     module ClassMethods
+      # Override to customize the report generator based on the charactersistics of the report or its options
+      # Default implementation uses default constructor and assigns to the report attribute.
+      def from(report)
+        out = self.new
+        out.report = report
+        out
+      end
       
       def generate_with(&block)
-        raise "Only one call to generate_with is permitted" if public_method_defined?(:generate)
+        raise "Only one call to generate_with is permitted (or none if #generate is implemented)" if public_method_defined?(:generate)
         define_method :generate do
+          raise "No report to generate!" if report.nil?
           out = nil
           begin
             logger.info("Generating #{report}...")
@@ -36,19 +46,27 @@ module Rapport
       end
       
       def cell_format(type, &block)
-        all_cell_formats[:"format_#{type}"] = Proc.new(&block)
+        instance_variable_get(:@cell_formatter).add_cell_format(type, &block)
       end
     end
     
-    attr_accessor :options
+    attr_accessor :report
     
-    def formatter
-      @formatter ||= ReportFormatter.new(self.class.all_cell_formats)
+    def options
+      report.options
+    end
+    
+    def cell_formatter
+      @cell_formatter ||= self.class.instance_variable_get(:@cell_formatter).dup
+    end
+    
+    def format(type, value)
+      cell_formatter.format(type, value)
     end
   
     def method_missing(method, *args)
       if method == :logger
-        if Rails
+        if Module.const_defined?("Rails")
           Rails.logger
         else
           @_logger ||= Logger.new(STDERR)
@@ -58,61 +76,42 @@ module Rapport
       end
     end
     
-    private
-    
-    def self.camel_case(value)
-      value.capitalize.gsub(/_(.)/){ $1.upcase }
-    end 
+    def each_row
+      report.each_row {|row| yield row }
+    end    
 
   end
   
-  class ReportFormatter
-    def initialize(procs)
+  class CellFormatter
+    
+    def initialize(procs = {})
       @procs = procs
     end
     
-    def initialize(options = {})
-      @options = options
+    def dup
+      CellFormatter.new(@procs.dup)
     end
-
-    def to_s
-      @options[:format]
+    
+    def add_cell_format(type, &block)
+      proc = Proc.new(&block)
+      @procs[type] = proc
+      @procs[Rapport.format_underscore(type.to_s)] = proc if type.is_a?(Class)
+      
+      # Support ActiveSupport::TimeWithZone automatically
+      if type == Time
+        add_cell_format(ActiveSupport::TimeWithZone, &block) if type == Time rescue nil
+      end
+      
     end
 
     def format(type,value)
-      return type.call(value) if type.is_a?(Proc)
-      method_name = nil
-      if type.nil?
-        method_name = :"format_#{format_underscore(value.class)}"
-      else
-        method_name = :"format_#{type.to_s}"
-      end
-
-      if !method_name.nil? && self.class.method_defined?(method_name)
-        self.send(method_name,value)
-      else
-        value
+      if type.is_a?(Proc)
+        type.call(value)
+      else 
+        proc = @procs[type] || @procs[value.class]
+        proc.nil? ? value : proc.call(value)
       end
     end
-    
-    def format_underscore(value)
-      Rapport.format_underscore(value)
-    end
+  end
 
-    def format_camel_case(value)
-      Rapport.format_camel_case(value)
-    end    
-    
-    def method_missing(method, value)
-      @procs[method].call(value)
-    end
-  end
-  
-  def self.format_underscore(value)
-    value.to_s.gsub(/\W/,'').gsub(/(.)([A-Z])/,'\1_\2').gsub(/_+/,'_').downcase
-  end
-  
-  def self.format_camel_case(value)
-    value.capitalize.gsub(/_(.)/){ $1.upcase }
-  end
 end
