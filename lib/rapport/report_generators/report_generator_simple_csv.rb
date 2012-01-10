@@ -2,7 +2,7 @@ require 'zip/zip'
 require 'fastercsv'
 
 module Rapport
-  class ReportGeneratorCsv
+  class ReportGeneratorSimpleCsv
     include ReportGenerator
 
     generate_with do |report|

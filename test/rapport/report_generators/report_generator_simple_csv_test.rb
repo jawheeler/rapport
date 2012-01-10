@@ -1,9 +1,9 @@
 require File.dirname(__FILE__) + '/../../test_helper'
-require 'rapport/report_generators/report_generator_csv'
+require 'rapport/report_generators/report_generator_simple_csv'
 
 class ReportTest < Test::Unit::TestCase
   setup do
-    @rg_csv = Rapport::ReportGeneratorCsv.new
+    @rg_csv = Rapport::ReportGeneratorSimpleCsv.new
   end
   
   context "cell_format Time" do
@@ -37,7 +37,7 @@ class ReportTest < Test::Unit::TestCase
   
   context ".generate" do
     setup do
-      @report = Rapport::TestReport.new(:format => 'csv', :to_string => true)
+      @report = Rapport::TestReport.new(:format => 'simple_csv', :to_string => true)
     end
     
     execute do
