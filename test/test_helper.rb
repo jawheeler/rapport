@@ -18,6 +18,17 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'rapport'
 
+Rapport.logger = Logger.new(
+  File.open(
+    File.join(
+      File.dirname(__FILE__), 
+      'logs', 
+      'test.log'
+    ),
+    'w'
+  )
+)
+
 class Object
   class Bypass
     instance_methods.each do |m|
@@ -44,65 +55,54 @@ class Test::Unit::TestCase
   end
 end
 
-module Rapport
-  class TestReport
-    include Rapport::Report
-  
-    def initialize(options = {})
-      self.options = options
-    end
-  
-    def each_model
-      (0..2).each do |r|
-        yield [(0..3).map { |c| "t0 #{c}#{r}" }, :type0]
-      end
-      raise options[:exception] if options[:exception]
-      (0..2).each do |r|
-        yield [(0..3).map { |c| "t1 #{c}#{r}" }, :type1]
-      end
-    end
+class Rapport::TestReport
+  include Rapport::Report
 
-    column "Column 0", :calc0
-
-    column "Column 1", :calc1, :type0 => lambda { |m| 'T0' + m[1] },
-                               :type1 => lambda { |m| 'T1' + m[1] },
-                               :format => :happy
-                            
-    column "Column 2", :calc2, :map_to => lambda { |m| 'D' + m[2] },
-                               :format  => lambda { |value| "Formatted" + value }
-  
-    column "Column 3", :calc3, :map_to => lambda { |m| row_data[:calc2] + m[3] },
-                               :format_special => lambda { |value| "Formatted Special" + value }
-
+  def initialize(options = {})
+    self.options = options
   end
 
-  class ReportGeneratorTest
-    include Rapport::ReportGenerator
-    
-    attr_reader :log
-    
-    def initialize
-      @log = ''
+  def each_model
+    struct = Struct.new(:calc0, :m1)
+    (0..2).each do |r|
+      (0..3).map { |c| yield struct.new(r, c), :type0 }
     end
-    
-    def logger
-      Logger.new(StringIO.new(@log))
+    raise options[:exception] if options[:exception]
+    (0..2).each do |r|
+      (0..3).map { |c| yield struct.new(r, c), :type1 }
     end
-  
-    generate_with do
-      output = "START\n"
-      each_row do |row|
-        output << (0...row.length).to_a.zip(row).join("-")
-        output << "\n"
-      end
-      output << "END\n"
-      output
-    end
-  
-    cell_format(:happy) {|value| "Happy#{value}"}
-      
-    cell_format(Time) {|value| value.strftime("%H:%m")}
   end
+
+  column "Column 0", :calc0
+
+  column "Column 1", :calc1, :type0 => lambda { |m| 'T0 ' + m.m1.to_s },
+                             :type1 => lambda { |m| 'T1 ' + m.m1.to_s },
+                             :format => :happy
+                          
+  column "Column 2", :calc2, :map_to => lambda { |m| '~' + m.m1.to_s },
+                             :format  => lambda { |value| "Formatted" + value }
+
+  column "Column 3", :calc3, :map_to => lambda { |m| row_data[:calc2] + '~' + m.calc0.to_s },
+                             :format_special => lambda { |value| "Formatted Special" + value }
+
+end
+
+class Rapport::ReportGeneratorTest
+  include Rapport::ReportGenerator
+
+  generate_with do |report|
+    output = "START\n"
+    each_row do |row|
+      output << (0...row.length).to_a.zip(row).join("-")
+      output << "\n"
+    end
+    output << "END\n"
+    output
+  end
+
+  cell_format(:happy) {|value| "Happy#{value}"}
+    
+  cell_format(Time) {|value| value.strftime("%H:%m")}
 end
 
 

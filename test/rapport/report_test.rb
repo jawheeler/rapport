@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../test_helper'
 
 class ReportTest < Test::Unit::TestCase
   setup do
-    @report = TestReport.new
+    @report = Rapport::TestReport.new
   end
   
   context ".each_row" do
@@ -14,7 +14,7 @@ class ReportTest < Test::Unit::TestCase
   
     should "return a row for each raw row" do
       raw_rows = []
-      @report.each_model {|row| raw_rows << row}
+      @report.each_model {|row, type| raw_rows << row}
       assert_equal raw_rows.length, @execute_result.length
     end
   
@@ -54,7 +54,7 @@ class ReportTest < Test::Unit::TestCase
     end
   
     should "return a table name based on the reports actual class if :report_class isn't configured" do
-      assert_equal 'reports_test', @report.table_name
+      assert_equal 'reports_rapport_test', @report.table_name
     end
   
   end

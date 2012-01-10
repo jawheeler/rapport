@@ -1,10 +1,8 @@
-require 'logger'
-
 module Rapport
   module ReportGenerator
     
     def self.from(report)
-      options = report.options
+      options = {:format => 'fake'}.merge(report.options)
       Rapport.const_get("ReportGenerator#{Rapport.format_camel_case(options[:format].to_s)}").from(report)
     end   
     
@@ -26,20 +24,22 @@ module Rapport
         out
       end
       
+      # generate_with {|report| ... }
+      # Provides a logging/error handling wrapper for the passed block. Automatically cretes report_generator.generate.
       def generate_with(&block)
         raise "Only one call to generate_with is permitted (or none if #generate is implemented)" if public_method_defined?(:generate)
         define_method :generate do
           raise "No report to generate!" if report.nil?
           out = nil
           begin
-            logger.info("Generating #{report}...")
-            out = block.call
-            logger.info("Generated #{report}.")
+            Rapport.logger.info("Generating #{report}...")
+            out = block.call(report)
+            Rapport.logger.info("Generated #{report}.")
           rescue Exception => e
             error = report.current_model.nil? ? '' : "While processing:\n\n#{report.current_model.inspect}\n\n"
             error += "#{report} failed:\n\n#{e.message}\n\n#{e.backtrace.join("\n")}"
-            logger.error(error)
-            logger.mail(:error,error) if logger.respond_to?(:mail)
+            Rapport.logger.error(error)
+            Rapport.logger.mail(:error,error) if Rapport.logger.respond_to?(:mail)
           end
           out
         end
@@ -48,13 +48,13 @@ module Rapport
       def cell_format(type, &block)
         instance_variable_get(:@cell_formatter).add_cell_format(type, &block)
       end
+      
+      def format_as(type, value)
+        instance_variable_get(:@cell_formatter).format(type, value)
+      end
     end
     
     attr_accessor :report
-    
-    def options
-      report.options
-    end
     
     def cell_formatter
       @cell_formatter ||= self.class.instance_variable_get(:@cell_formatter).dup
@@ -63,22 +63,10 @@ module Rapport
     def format(type, value)
       cell_formatter.format(type, value)
     end
-  
-    def method_missing(method, *args)
-      if method == :logger
-        if Module.const_defined?("Rails")
-          Rails.logger
-        else
-          @_logger ||= Logger.new(STDERR)
-        end
-      else
-        super(method, *args)
-      end
-    end
     
-    def each_row
-      report.each_row {|row| yield row }
-    end    
+    def output_filename
+      @output_filename ||= File.join(@options[:output_dir] || '.', "#{report_name}_#{Time.now.strftime('%Y-%m-%d-%H%M%S')}.csv")
+    end     
 
   end
   
@@ -99,12 +87,12 @@ module Rapport
       
       # Support ActiveSupport::TimeWithZone automatically
       if type == Time
-        add_cell_format(ActiveSupport::TimeWithZone, &block) if type == Time rescue nil
+        add_cell_format(ActiveSupport::TimeWithZone, &block) rescue nil
       end
       
     end
 
-    def format(type,value)
+    def format(type,value)     
       if type.is_a?(Proc)
         type.call(value)
       else 

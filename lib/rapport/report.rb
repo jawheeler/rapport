@@ -13,6 +13,8 @@ module Rapport
     end
     
     module ClassMethods
+      attr_accessor :row_data
+      
       def column(*args, &block)
         raise ArgumentError.new("wrong number of arguments (#{args.length} for 1,2, or 3)") unless args.length >= 1 and args.length <= 3
         header = args[0]
@@ -36,7 +38,11 @@ module Rapport
       end
     end
     
-    attr_accessor :row_data, :section_data, :current_model, :options   
+    attr_accessor :section_data, :current_model, :options
+    
+    def row_data
+      self.class.row_data
+    end
   
     def report_generator
       @_report_generator ||= ReportGenerator.from(self)
@@ -72,6 +78,10 @@ module Rapport
     def column_symbols
       @_column_symbols ||= columns.map{|c| c[1]}
     end
+    
+    def to_model_class
+      @_to_model_class ||= Struct.new("#{self.class}Model", *column_symbols)
+    end
   
     def table_name
       @table_name ||= options[:report_table_name] || "reports_#{Rapport.format_underscore(self.class).sub(/_?report_?/,'')}"
@@ -82,7 +92,7 @@ module Rapport
     end
   
     def formatted_cell_value(key, model, row_type)
-      raw_value = raw_cell_value(key, model, row_type)
+      row_data[key] = raw_value = raw_cell_value(key, model, row_type)
       report_generator.format(cell_format_for(key), raw_value)
     end  
   
@@ -105,11 +115,11 @@ module Rapport
     private
   
     def formatted_row(model, row_type)
-      self.row_data = {}
+      self.class.row_data = {}
       out = column_symbols.map do |key|
         formatted_cell_value(key, model, row_type)
       end
-      self.row_data = {}
+      self.class.row_data = {}
       out
     end
   

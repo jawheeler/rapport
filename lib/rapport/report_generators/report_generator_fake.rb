@@ -2,14 +2,10 @@ module Rapport
   class ReportGeneratorFake
     include ReportGenerator
 
-    attr_accessor :options,:output,:report
+    attr_accessor :output
 
-    def initialize(report)
-      @output = []
-    end
-
-    def generate_internal
-      @output << report.column_names
+    generate_with do |report|
+      @output << report.column_headers
       report.each_row do |row|
         @output << row
       end

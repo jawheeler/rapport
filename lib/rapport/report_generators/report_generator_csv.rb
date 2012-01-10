@@ -1,25 +1,33 @@
 require 'zip/zip'
+require 'fastercsv'
 
 module Rapport
   class ReportGeneratorCsv
     include ReportGenerator
 
-    generate_with do
-      i=0
-      FasterCSV.open(output_filename, 'w') do |csv|
-        csv << report.column_names
-        report.each_row do |row|
-          csv << row
-          logger.debug(row.inspect) if i%1000==0
-          i+=1
-        end
-      end
+    generate_with do |report|
+      if report.options[:to_string].nil?
+        FasterCSV.open(output_filename, 'w') {|csv| generate_internal(report, csv) }
 
-      zip_output_file! if options[:zip]
-      send_email if options[:emails]
-      send_ftp if options[:ftps]
+        zip_output_file! if report.options[:zip]
     
-      return output_filename
+        output_filename
+      else
+        FasterCSV.generate {|csv| generate_internal(report, csv) }
+      end
+    end
+    
+    cell_format(:cents) do |value| 
+      !value.nil? && 
+      ("%.2f" % (value.to_s.to_d / '100'.to_d))
+    end
+    
+    cell_format(Time) do |value|
+      value.strftime('%B %e, %Y')
+    end
+    
+    cell_format(Date) do |value|
+      format_as(Time,Time.utc(value.year, value.month, value.day))
     end
 
     def zip_output_file!
@@ -33,9 +41,18 @@ module Rapport
     def report_name
       report.table_name.sub('reports_','')
     end
-  
-    def output_filename
-      @output_filename ||= File.join((@options[:output_dir] || File.join(report.base_path,'tmp')) , "#{report_name}_#{Time.now.strftime('%Y-%m-%d-%H%M%S')}.csv")
+    
+    private
+    
+    def self.generate_internal(report, csv)
+      i = 0
+      csv << report.column_headers
+      report.each_row do |row|
+        csv << row
+        Rapport.logger.debug(row.inspect) if i%1000==0
+        i+=1
+      end      
     end
+
   end
 end

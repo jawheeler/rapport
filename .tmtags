@@ -5,7 +5,7 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.7	//
 Bypass	test/test_helper.rb	/^  class Bypass$/;"	class	line:22
-CellFormatter	lib/rapport/report_generator.rb	/^  class CellFormatter$/;"	class	line:81
+CellFormatter	lib/rapport/report_generator.rb	/^  class CellFormatter$/;"	class	line:89
 ClassMethods	lib/rapport/report.rb	/^    module ClassMethods$/;"	module	line:15
 ClassMethods	lib/rapport/report_generator.rb	/^    module ClassMethods$/;"	module	line:20
 Foo	lib/test.rb	/^class Foo$/;"	class	line:1
@@ -27,64 +27,70 @@ Test	build/test/helper.rb	/^class Test::Unit::TestCase$/;"	class	line:17
 Test	test/test_helper.rb	/^class Test::Unit::TestCase$/;"	class	line:41
 TestBuild	build/test/test_build.rb	/^class TestBuild < Test::Unit::TestCase$/;"	class	line:3
 TestReport	test/test_helper.rb	/^  class TestReport$/;"	class	line:48
-_calculators	lib/rapport/report.rb	/^    def _calculators$/;"	method	line:119
-add_calculator	lib/rapport/report.rb	/^      def add_calculator(symbol, options)$/;"	method	line:37
-add_cell_format	lib/rapport/report_generator.rb	/^    def add_cell_format(type, &block)$/;"	method	line:91
-base_calculator	lib/rapport/report.rb	/^    def base_calculator(key, calculator)$/;"	method	line:156
+_calculators	lib/rapport/report.rb	/^    def _calculators$/;"	method	line:120
+add_calculator	lib/rapport/report.rb	/^      def add_calculator(symbol, options)$/;"	method	line:34
+add_cell_format	lib/rapport/report_generator.rb	/^    def add_cell_format(type, &block)$/;"	method	line:99
+base_calculator	lib/rapport/report.rb	/^    def base_calculator(key, calculator)$/;"	method	line:157
 bypass	test/test_helper.rb	/^  def bypass$/;"	method	line:36
-cell_calculator_for	lib/rapport/report.rb	/^    def cell_calculator_for(key,row_type)$/;"	method	line:123
-cell_format	lib/rapport/report_generator.rb	/^      def cell_format(type, &block)$/;"	method	line:44
-cell_format_for	lib/rapport/report.rb	/^    def cell_format_for(key)$/;"	method	line:165
-cell_formatter	lib/rapport/report_generator.rb	/^    def cell_formatter$/;"	method	line:55
-column	lib/rapport/report.rb	/^      def column(*args)$/;"	method	line:16
-column_headers	lib/rapport/report.rb	/^    def column_headers$/;"	method	line:71
-column_symbols	lib/rapport/report.rb	/^    def column_symbols$/;"	method	line:75
-columns	lib/rapport/report.rb	/^    def columns$/;"	method	line:63
-dup	lib/rapport/report_generator.rb	/^    def dup$/;"	method	line:87
-each_model	lib/rapport/report.rb	/^    def each_model(&block)$/;"	method	line:104
+cell_calculator_for	lib/rapport/report.rb	/^    def cell_calculator_for(key,row_type)$/;"	method	line:124
+cell_format	lib/rapport/report_generator.rb	/^      def cell_format(type, &block)$/;"	method	line:48
+cell_format_for	lib/rapport/report.rb	/^    def cell_format_for(key)$/;"	method	line:166
+cell_formatter	lib/rapport/report_generator.rb	/^    def cell_formatter$/;"	method	line:59
+column	lib/rapport/report.rb	/^      def column(*args, &block)$/;"	method	line:16
+column_headers	lib/rapport/report.rb	/^    def column_headers$/;"	method	line:68
+column_symbols	lib/rapport/report.rb	/^    def column_symbols$/;"	method	line:72
+columns	lib/rapport/report.rb	/^    def columns$/;"	method	line:60
+dup	lib/rapport/report_generator.rb	/^    def dup$/;"	method	line:95
+each_model	lib/rapport/report.rb	/^    def each_model(&block)$/;"	method	line:105
 each_model	test/test_helper.rb	/^    def each_model$/;"	method	line:55
-each_row	lib/rapport/report.rb	/^    def each_row$/;"	method	line:56
-each_row	lib/rapport/report_generator.rb	/^    def each_row$/;"	method	line:75
-format	lib/rapport/report_generator.rb	/^    def format(type, value)$/;"	method	line:59
-format	lib/rapport/report_generator.rb	/^    def format(type,value)$/;"	method	line:103
+each_row	lib/rapport/report.rb	/^    def each_row$/;"	method	line:53
+each_row	lib/rapport/report_generator.rb	/^    def each_row$/;"	method	line:79
+format	lib/rapport/report_generator.rb	/^    def format(type, value)$/;"	method	line:63
+format	lib/rapport/report_generator.rb	/^    def format(type,value)$/;"	method	line:111
+format for class	test/rapport/report_generator_test.rb	/^      share_should("format for class") do$/;"	shared_should	line:96
+format for symbol	test/rapport/report_generator_test.rb	/^      share_should("format for symbol") do$/;"	shared_should	line:92
 format_camel_case	lib/helpers.rb	/^    def format_camel_case(value)$/;"	method	line:22
 format_underscore	lib/helpers.rb	/^    def format_underscore(value)$/;"	method	line:18
-formatted_cell_value	lib/rapport/report.rb	/^    def formatted_cell_value(key, model, row_type)$/;"	method	line:87
-formatted_row	lib/rapport/report.rb	/^    def formatted_row(model, row_type)$/;"	method	line:110
-from	lib/rapport/report_generator.rb	/^      def from(report)$/;"	method	line:22
+formatted_cell_value	lib/rapport/report.rb	/^    def formatted_cell_value(key, model, row_type)$/;"	method	line:88
+formatted_row	lib/rapport/report.rb	/^    def formatted_row(model, row_type)$/;"	method	line:111
+from	lib/rapport/report_generator.rb	/^      def from(report)$/;"	method	line:23
 from	lib/rapport/report_generator.rb	/^    def self.from(report)$/;"	singleton method	line:6
-generate	lib/rapport/report.rb	/^    def generate$/;"	method	line:48
+generate	lib/rapport/report.rb	/^    def generate$/;"	method	line:45
 generate_internal	lib/rapport/report_generators/report_generator_fake.rb	/^    def generate_internal$/;"	method	line:11
-generate_with	lib/rapport/report_generator.rb	/^      def generate_with(&block)$/;"	method	line:26
+generate_with	lib/rapport/report_generator.rb	/^      def generate_with(&block)$/;"	method	line:29
 hello	lib/test.rb	/^  def self.hello$/;"	singleton method	line:8
 included	lib/rapport/report.rb	/^    def self.included(base)$/;"	singleton method	line:4
 included	lib/rapport/report_generator.rb	/^    def self.included(base)$/;"	singleton method	line:11
 inherited	lib/rapport/report.rb	/^      def base.inherited(subclass)$/;"	singleton method	line:8
 inherited	lib/rapport/report_generator.rb	/^      def base.inherited(subclass)$/;"	singleton method	line:14
 inherited	lib/test.rb	/^  def self.inherited(subclass)$/;"	singleton method	line:4
-initialize	lib/rapport/report_generator.rb	/^    def initialize(procs = {})$/;"	method	line:83
+initialize	lib/rapport/report_generator.rb	/^    def initialize(procs = {})$/;"	method	line:91
 initialize	lib/rapport/report_generators/report_generator_fake.rb	/^    def initialize(report)$/;"	method	line:7
+initialize	test/test_helper.rb	/^    def initialize$/;"	method	line:84
 initialize	test/test_helper.rb	/^    def initialize(options = {})$/;"	method	line:51
 initialize	test/test_helper.rb	/^    def initialize(ref)$/;"	method	line:27
-method_missing	lib/rapport/report_generator.rb	/^    def method_missing(method, *args)$/;"	method	line:63
+logger	test/test_helper.rb	/^    def logger$/;"	method	line:88
+method_missing	lib/rapport/report_generator.rb	/^    def method_missing(method, *args)$/;"	method	line:67
 method_missing	test/test_helper.rb	/^    def method_missing(sym, *args)$/;"	method	line:31
-options	lib/rapport/report.rb	/^    def options$/;"	method	line:52
-options	lib/rapport/report_generator.rb	/^    def options$/;"	method	line:51
-output_filename	lib/rapport/report_generators/report_generator_csv.rb	/^    def output_filename$/;"	method	line:37
-raw_cell_value	lib/rapport/report.rb	/^    def raw_cell_value(key, model, row_type)$/;"	method	line:83
-report_generator	lib/rapport/report.rb	/^    def report_generator$/;"	method	line:44
-report_name	lib/rapport/report_generators/report_generator_csv.rb	/^    def report_name$/;"	method	line:33
+options	lib/rapport/report.rb	/^    def options$/;"	method	line:49
+options	lib/rapport/report_generator.rb	/^    def options$/;"	method	line:55
+output_filename	lib/rapport/report_generator.rb	/^    def output_filename$/;"	method	line:83
+raw_cell_value	lib/rapport/report.rb	/^    def raw_cell_value(key, model, row_type)$/;"	method	line:84
+report_generator	lib/rapport/report.rb	/^    def report_generator$/;"	method	line:41
+report_name	lib/rapport/report_generators/report_generator_csv.rb	/^    def report_name$/;"	method	line:31
 return a proc	test/rapport/report_test.rb	/^    share_should("return a proc") do$/;"	shared_should	line:77
 return a proc never sending	test/rapport/report_test.rb	/^    share_should("return a proc never sending") do |symbols|$/;"	shared_should	line:98
 return a proc sending	test/rapport/report_test.rb	/^    share_should("return a proc sending") do |symbols|$/;"	shared_should	line:89
 return nil	test/test_helper.rb	/^  share_should("return nil") do$/;"	shared_should	line:42
 return the lambda	test/rapport/report_test.rb	/^    share_should "return the lambda" do$/;"	shared_should	line:81
+return value	test/rapport/report_generator_test.rb	/^      share_should "return value" do$/;"	shared_should	line:123
 safe_proc	lib/helpers.rb	/^    def safe_proc(proc)$/;"	method	line:4
 safe_send	lib/helpers.rb	/^    def safe_send(key)$/;"	method	line:14
-section	lib/rapport/report.rb	/^    def section(section_data = {}, &block)$/;"	method	line:98
-table_name	lib/rapport/report.rb	/^    def table_name$/;"	method	line:79
-through_calculator	lib/rapport/report.rb	/^    def through_calculator(throughs, base_calculator)$/;"	method	line:143
-to_s	lib/rapport/report.rb	/^    def to_s$/;"	method	line:92
+section	lib/rapport/report.rb	/^    def section(section_data = {}, &block)$/;"	method	line:99
+table_name	lib/rapport/report.rb	/^    def table_name$/;"	method	line:80
+through_calculator	lib/rapport/report.rb	/^    def through_calculator(throughs, base_calculator)$/;"	method	line:144
+to_model_class	lib/rapport/report.rb	/^    def to_model_class$/;"	method	line:76
+to_s	lib/rapport/report.rb	/^    def to_s$/;"	method	line:93
 with :through	test/rapport/report_test.rb	/^    share_setup("with :through") do$/;"	shared_should	line:73
 wrap the lambda	test/rapport/report_test.rb	/^    share_should "wrap the lambda" do$/;"	shared_should	line:85
-zip_output_file!	lib/rapport/report_generators/report_generator_csv.rb	/^    def zip_output_file!$/;"	method	line:25
+zip_output_file!	lib/rapport/report_generators/report_generator_csv.rb	/^    def zip_output_file!$/;"	method	line:23

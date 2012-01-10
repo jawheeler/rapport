@@ -1,3 +1,5 @@
+require 'logger'
+
 module Rapport
   
   class << self
@@ -5,7 +7,7 @@ module Rapport
       lambda do |m|
         begin
           proc.call(m) 
-        rescue NameError => ne 
+        rescue NameError => ne
           nil
         end
       end
@@ -21,6 +23,18 @@ module Rapport
   
     def format_camel_case(value)
       value.to_s.capitalize.gsub(/_(.)/){ $1.upcase }
+    end
+    
+    def logger
+      if Module.const_defined?("Rails")
+        @_logger ||= Rails.logger
+      else
+        @_logger ||= Logger.new(STDERR)
+      end
+    end
+    
+    def logger=(logger)
+      @_logger = logger
     end
   end
       
