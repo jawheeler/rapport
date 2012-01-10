@@ -29,81 +29,84 @@ Rapport.logger = Logger.new(
   )
 )
 
-class Object
-  class Bypass
-    instance_methods.each do |m|
-      undef_method m unless m =~ /^__/
+unless defined?(Rapport::ReportGeneratorTest)
+
+  class Object
+    class Bypass
+      instance_methods.each do |m|
+        undef_method m unless m =~ /^__/
+      end
+
+      def initialize(ref)
+        @ref = ref
+      end
+
+      def method_missing(sym, *args)
+        @ref.__send__(sym, *args)
+      end
     end
 
-    def initialize(ref)
-      @ref = ref
-    end
-
-    def method_missing(sym, *args)
-      @ref.__send__(sym, *args)
-    end
-  end
-
-  def bypass
-    Bypass.new(self)
-  end
-end
-
-class Test::Unit::TestCase
-  share_should("return nil") do
-    assert_equal nil, @execute_result
-  end
-end
-
-class Rapport::TestReport
-  include Rapport::Report
-
-  def initialize(options = {})
-    self.options = options
-  end
-
-  def each_model
-    struct = Struct.new(:calc0, :m1)
-    (0..2).each do |r|
-      (0..3).map { |c| yield struct.new(r, c), :type0 }
-    end
-    raise options[:exception] if options[:exception]
-    (0..2).each do |r|
-      (0..3).map { |c| yield struct.new(r, c), :type1 }
+    def bypass
+      Bypass.new(self)
     end
   end
 
-  column "Column 0", :calc0
+  class Test::Unit::TestCase
+    share_should("return nil") do
+      assert_equal nil, @execute_result
+    end
+  end
 
-  column "Column 1", :calc1, :type0 => lambda { |m| 'T0 ' + m.m1.to_s },
-                             :type1 => lambda { |m| 'T1 ' + m.m1.to_s },
-                             :format => :happy
+  class Rapport::TestReport
+    include Rapport::Report
+
+    def initialize(options = {})
+      self.options = options
+    end
+
+    def each_model
+      struct = Struct.new(:calc0, :m1)
+      (0..2).each do |r|
+        (0..3).map { |c| yield struct.new(r, c), :type0 }
+      end
+      raise options[:exception] if options[:exception]
+      (0..2).each do |r|
+        (0..3).map { |c| yield struct.new(r, c), :type1 }
+      end
+    end
+
+    column "Column 0", :calc0
+
+    column "Column 1", :calc1, :type0 => lambda { |m| 'T0 ' + m.m1.to_s },
+                               :type1 => lambda { |m| 'T1 ' + m.m1.to_s },
+                               :format => :happy
                           
-  column "Column 2", :calc2, :map_to => lambda { |m| '~' + m.m1.to_s },
-                             :format  => lambda { |value| "Formatted" + value }
+    column "Column 2", :calc2, :map_to => lambda { |m| '~' + m.m1.to_s },
+                               :format  => lambda { |value| "Formatted" + value }
 
-  column "Column 3", :calc3, :map_to => lambda { |m| row_data[:calc2] + '~' + m.calc0.to_s },
-                             :format_special => lambda { |value| "Formatted Special" + value }
+    column "Column 3", :calc3, :map_to => lambda { |m| row_data[:calc2] + '~' + m.calc0.to_s },
+                               :format_special => lambda { |value| "Formatted Special" + value }
 
-end
-
-class Rapport::ReportGeneratorTest
-  include Rapport::ReportGenerator
-
-  generate_with do |report|
-    output = "START\n"
-    each_row do |row|
-      output << (0...row.length).to_a.zip(row).join("-")
-      output << "\n"
-    end
-    output << "END\n"
-    output
   end
 
-  cell_format(:happy) {|value| "Happy#{value}"}
-    
-  cell_format(Time) {|value| value.strftime("%H:%m")}
-end
+  class Rapport::ReportGeneratorTest
+    include Rapport::ReportGenerator
 
+    generate_with do |report|
+      output = "START\n"
+      each_row do |row|
+        output << (0...row.length).to_a.zip(row).join("-")
+        output << "\n"
+      end
+      output << "END\n"
+      output
+    end
+
+    cell_format(:happy) {|value| "Happy#{value}"}
+    
+    cell_format(Time) {|value| value.strftime("%H:%m")}
+  end
+
+end
 
 
