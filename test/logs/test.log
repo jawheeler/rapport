@@ -1,0 +1,6 @@
+I, [2012-01-10T11:15:14.417199 #688]  INFO -- : Generating Rapport::TestReport csv...
+D, [2012-01-10T11:15:14.418053 #688] DEBUG -- : [0, "T0 0", "Formatted~0", "~0~0"]
+I, [2012-01-10T11:15:14.419484 #688]  INFO -- : Generated Rapport::TestReport csv.
+I, [2012-01-10T11:15:14.419983 #688]  INFO -- : Generating Rapport::TestReport csv...
+D, [2012-01-10T11:15:14.420228 #688] DEBUG -- : [0, "T0 0", "Formatted~0", "~0~0"]
+I, [2012-01-10T11:15:14.421822 #688]  INFO -- : Generated Rapport::TestReport csv.
