@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rapport}
-  s.version = "0.0.4"
+  s.version = "0.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Andrew Wheeler}]
@@ -30,13 +30,12 @@ Gem::Specification.new do |s|
     "lib/rapport.rb",
     "lib/rapport/report.rb",
     "lib/rapport/report_generator.rb",
-    "lib/rapport/report_generators/report_generator_csv.rb",
     "lib/rapport/report_generators/report_generator_fake.rb",
+    "lib/rapport/report_generators/report_generator_simple_csv.rb",
     "lib/test.rb",
     "rapport.gemspec",
-    "test/logs/test.log",
     "test/rapport/report_generator_test.rb",
-    "test/rapport/report_generators/report_generator_csv_test.rb",
+    "test/rapport/report_generators/report_generator_simple_csv_test.rb",
     "test/rapport/report_test.rb",
     "test/test_helper.rb"
   ]
